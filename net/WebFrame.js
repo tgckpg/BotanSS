@@ -11,7 +11,7 @@ var Framework = function( garden )
 
 	var Router = require( "./Router" );
 	this.router = new Router( garden );
-	this.router.addRoute( "404", false, "p404" );
+	this.router.addRoute( "404", false, "404" );
 
 	this.handlers = {
 		"404": function()

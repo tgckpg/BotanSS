@@ -6,7 +6,7 @@ function error( msg )
 	var e = new Error();
 	e = e.stack.split( "\n" );
 	e[0] = this.name;
-	e[1] = "";
+	e[1] = msg;
 
 	this.stack = e.join( "\n" );
 }
