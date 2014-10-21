@@ -62,7 +62,7 @@ Framework.prototype.parseResult = function()
 		var method = this.router.route();
 		if( method )
 		{
-			Dragonfly.Debug( "Call " + method );
+			Dragonfly.Log( "Call " + method, Dragonfly.Spheres.THERMO );
 
 			if( this.handlers[ method ] )
 			{
@@ -74,7 +74,6 @@ Framework.prototype.parseResult = function()
 		throw new FatalError( "Relay handler \"" + method + "\" is not defined" );
 	}
 
-	this.plantResult();
 };
 
 Framework.prototype.plantResult = function()
