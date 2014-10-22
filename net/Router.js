@@ -1,5 +1,9 @@
 var Dragonfly = global.Dragonfly;
-var FatalError = require( '../errors/FatalError.js' );
+
+var util = require( "util" )
+	, events = require( "events" )
+	, FatalError = require( '../errors/FatalError.js' )
+;
 
 var MaxRedirect = 10;
 
@@ -19,6 +23,8 @@ var RelayPoint = function( uri, internal )
 
 var Router = function( http )
 {
+	events.EventEmitter.call( this );
+
 	this.HTTP = http;
 	this.routes = {};
 	this.routable = true;
@@ -27,10 +33,12 @@ var Router = function( http )
 	// Changed when routing
 	this.inputs = [];
 	this.routeObj = {};
-	this.reroute = false;
+	this.reRoute = false;
 
 	this.relaying = new RelayPoint( http.request.raw.url );
 };
+
+util.inherits( Router, events.EventEmitter );
 
 Router.prototype.addRoute = function( name, _route, _action, _status )
 {
@@ -97,7 +105,7 @@ Router.prototype.setRoute = function( _route, _match )
 		, inputs: this.inputs
 
 		// Re-route function
-		, reroute: function( target, direct )
+		, reRoute: function( target, direct )
 		{
 			Dragonfly.Log(
 				"Reroute: " + target
@@ -105,8 +113,10 @@ Router.prototype.setRoute = function( _route, _match )
 			);
 			this.relaying = new RelayPoint( target, direct );
 			this.routable = true;
-			this.reroute = true;
+			this.reRoute = true;
+			this.emit( "Route" );
 		}.bind( this )
 	};
 };
+
 module.exports = Router;

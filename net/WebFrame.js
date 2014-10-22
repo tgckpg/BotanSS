@@ -12,6 +12,7 @@ var Framework = function( garden )
 	var Router = require( "./Router" );
 	this.router = new Router( garden );
 	this.router.addRoute( "404", false, "404" );
+	this.router.addListener( "Route", this.parseResult.bind( this ) );
 
 	this.handlers = {
 		"404": function()
@@ -59,7 +60,7 @@ Framework.prototype.addHandler = function( name, method )
 
 Framework.prototype.parseResult = function()
 {
-	while( this.router.routable )
+	if( this.router.routable )
 	{
 		var method = this.router.route();
 		if( method )
@@ -69,14 +70,14 @@ Framework.prototype.parseResult = function()
 			if( this.handlers[ method ] )
 			{
 				this.handlers[ method ]( this.router.routeObj );
-				continue;
+				return;
 			}
 		}
 		else if( method === false )
 		{
 			Dragonfly.Log( "No route is defined to handle this URI", Dragonfly.Spheres.THERMO );
-			this.router.routeObj.reroute( "404", true );
-			continue;
+			this.router.routeObj.reRoute( "404", true );
+			return;
 		}
 
 		throw new FatalError( "Relay handler \"" + method + "\" is not defined" );
