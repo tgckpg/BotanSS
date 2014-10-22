@@ -82,6 +82,7 @@ Router.prototype.route = function()
 		}
 	}
 
+	this.setRoute( "*", currentRoute );
 	this.routable = false;
 	return false;
 };

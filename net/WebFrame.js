@@ -18,6 +18,7 @@ var Framework = function( garden )
 		{
 			this.HTTP.response.statusCode = 404;
 			this.result = "404 Not Found";
+			this.plantResult();
 		}.bind( this )
 	}
 };
@@ -69,6 +70,12 @@ Framework.prototype.parseResult = function()
 				this.handlers[ method ]( this.router.routeObj );
 				continue;
 			}
+		}
+		else if( method === false )
+		{
+			Dragonfly.Log( "No route is defined to handle this URI", Dragonfly.Spheres.THERMO );
+			this.router.routeObj.reroute( "404", true );
+			continue;
 		}
 
 		throw new FatalError( "Relay handler \"" + method + "\" is not defined" );
