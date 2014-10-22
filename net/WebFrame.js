@@ -43,7 +43,8 @@ Framework.prototype.run = function()
 	}
 
 	Dragonfly.Info(
-		method + ": " + encodeURI( this.HTTP.request.raw.url )
+		this.HTTP.request.remoteAddr + " "
+		+ method + ": " + encodeURI( this.HTTP.request.raw.url )
 		+ " - " + this.HTTP.request.raw.headers["user-agent"]
 		, Dragonfly.Visibility.VISIBLE
 	);
