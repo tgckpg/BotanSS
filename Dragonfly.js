@@ -28,8 +28,11 @@ function Dragonfly()
 	Dragonfly.currentSphere = 10;
 
 	Dragonfly.Spheres = {
+		// Debug
 		THERMO: 30
+		// Inspect
 		, STRATO: 20
+		// Production
 		, HYDRO: 10
 		, LITHO: 0
 	};

@@ -9,7 +9,7 @@ var HTTP = function( req, res )
 	this.response = {
 		statusCode: 200
 		, headers: {
-			"Content-Type": "text/html"
+			"Content-Type": "text/html; charset=utf-8"
 			, "Powered-By": "Botanical Framework (Node.js)"
 		}
 		, write: function( str ) { _self.response.content = str }
