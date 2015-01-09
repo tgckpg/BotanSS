@@ -87,9 +87,9 @@ Dragonfly.prototype.Log = function( mesg, sphere, visibility )
 	sphere += visibility;
 
 	var write = true;
-	if( Dragonfly.currentSphere < sphere )
+	if( this.currentSphere < sphere )
 	{
-		write = ( Dragonfly.currentSphere % 10 < sphere % 10 );
+		write = ( this.currentSphere % 10 < sphere % 10 );
 	}
 
 	// Writeline if yes
