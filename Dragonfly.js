@@ -1,4 +1,4 @@
-var util = require('util');
+var util = require( "util" );
 
 /*{{{ Private methods */
 // Months
@@ -22,33 +22,33 @@ function logDate( date )
 }
 /*}}}*/
 // Logger
-function Dragonfly()
+function Dragonfly( logHandler )
 {
-	// Static properties
-	Dragonfly.currentSphere = 10;
-
-	Dragonfly.Spheres = {
-		// Debug
-		THERMO: 30
-		// Inspect
-		, STRATO: 20
-		// Production
-		, HYDRO: 10
-		, LITHO: 0
-	};
-
-	Dragonfly.Visibility = {
-		VISIBLE: 9
-		, VH8: 8, VH7: 7, VH6: 6
-		, HIDDEN: 5
-		, HU4: 4, HU3: 3, HU2: 2
-		, UNSEEN: 1
-	};
+	this.currentSphere = Dragonfly.defaultSphere;
+	this.Visibility = Dragonfly.Visibility;
+	this.Spheres = Dragonfly.Spheres;
 
 	// Bind prototype functions
 	for( var i in Dragonfly.prototype )
 	{
 		Dragonfly[i] = this[i].bind( this );
+	}
+
+	var cluster = require( "cluster" );
+	if( cluster.isMaster )
+	{
+		this.logHandler = logHandler || { write: console.log };
+		this.messageBus = function( msg )
+		{
+			if( msg.cmd == "dragonLog" )
+			{
+				this.logHandler.write( msg.data );
+			}
+		}.bind( this );
+	}
+	else
+	{
+		this.logHandler = { write: function( e ) { process.send({ cmd: "dragonLog", data: e }); } };
 	}
 
 	var cluster = require("cluster");
@@ -117,9 +117,28 @@ Dragonfly.prototype.writeLine = function ()
 
 Dragonfly.prototype.__log = function ( line )
 {
-	console.log( this.ptag + logDate( new Date() ) + line );
+	this.logHandler.write( this.ptag + logDate( new Date() ) + util.format( line ) + "\n" );
 };
 
-new Dragonfly();
+// Static properties
+Dragonfly.defaultSphere = 10;
 
-global.Dragonfly = Dragonfly;
+Dragonfly.Spheres = {
+	// Debug
+	THERMO: 30
+	// Inspect
+	, STRATO: 20
+	// Production
+	, HYDRO: 10
+	, LITHO: 0
+};
+
+Dragonfly.Visibility = {
+	VISIBLE: 9
+	, VH8: 8, VH7: 7, VH6: 6
+	, HIDDEN: 5
+	, HU4: 4, HU3: 3, HU2: 2
+	, UNSEEN: 1
+};
+
+module.exports = Dragonfly;
