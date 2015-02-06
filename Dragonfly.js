@@ -92,8 +92,13 @@ Dragonfly.prototype.Log = function( mesg, sphere, visibility )
 		write = ( this.currentSphere % 10 < sphere % 10 );
 	}
 
-	// Writeline if yes
-	write && this.writeLine( mesg );
+	if( write )
+	{
+		typeof( mesg ) == "function"
+			? mesg( this.writeLine )
+			: this.writeLine( mesg )
+			;
+	}
 };
 
 Dragonfly.prototype.writeLine = function ()
