@@ -40,10 +40,11 @@ var Router = function( http )
 
 util.inherits( Router, events.EventEmitter );
 
-Router.prototype.addRoute = function( name, _route, _action, _status )
+Router.prototype.addRoute = function( _name, _route, _action, _status )
 {
-	this.routes[ name ] = {
-		route: _route
+	this.routes[ _name ] = {
+		name: _name
+		, route: _route
 		, action: String( _action )
 		, status: Boolean(
 			typeof _status !== 'undefined' ? _status : true
