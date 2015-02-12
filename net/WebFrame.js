@@ -12,6 +12,7 @@ var Framework = function( garden )
 	var Router = require( "./Router" );
 	this.router = new Router( garden );
 	this.router.addRoute( "404", false, "404" );
+	this.router.addRoute( "500", false, "500" );
 	this.router.addListener( "Route", this.parseResult.bind( this ) );
 
 	this.handlers = {
@@ -19,6 +20,12 @@ var Framework = function( garden )
 		{
 			this.HTTP.response.statusCode = 404;
 			this.result = "404 Not Found";
+			this.plantResult();
+		}.bind( this )
+		, "500": function()
+		{
+			this.HTTP.response.statusCode = 500;
+			this.result = "500 Internal Server Error";
 			this.plantResult();
 		}.bind( this )
 	}
@@ -65,7 +72,7 @@ Framework.prototype.parseResult = function()
 		var method = this.router.route();
 		if( method )
 		{
-			Dragonfly.Log( "Call " + method, Dragonfly.Spheres.THERMO );
+			Dragonfly.Debug( "Call " + method, Dragonfly.Spheres.THERMO );
 
 			if( this.handlers[ method ] )
 			{
@@ -75,7 +82,7 @@ Framework.prototype.parseResult = function()
 		}
 		else if( method === false )
 		{
-			Dragonfly.Log( "No route is defined to handle this URI", Dragonfly.Spheres.THERMO );
+			Dragonfly.Debug( "No route is defined to handle this URI", Dragonfly.Spheres.THERMO );
 			this.router.routeObj.reRoute( "404", true );
 			return;
 		}

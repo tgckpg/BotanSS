@@ -108,7 +108,7 @@ Router.prototype.setRoute = function( _route, _match )
 		// Re-route function
 		, reRoute: function( target, direct )
 		{
-			Dragonfly.Log(
+			Dragonfly.Debug(
 				"Reroute: " + target
 				+ ( direct ? ", Direct" : "" )
 			);

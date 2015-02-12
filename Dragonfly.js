@@ -57,22 +57,22 @@ function Dragonfly( logHandler )
 	this.Info( "Dragonfly ready.", Dragonfly.Visibility.VISIBLE );
 }
 
-Dragonfly.prototype.Info = function( mesg, visibility )
+Dragonfly.prototype.Debug = function( mesg, visibility )
 {
 	this.Log( mesg, Dragonfly.Spheres.THERMO, visibility );
 };
 
-Dragonfly.prototype.Warning = function( mesg, visibility )
+Dragonfly.prototype.Info = function( mesg, visibility )
 {
 	this.Log( mesg, Dragonfly.Spheres.STRATO, visibility );
 };
 
-Dragonfly.prototype.Error = function( mesg, visibility )
+Dragonfly.prototype.Warning = function( mesg, visibility )
 {
 	this.Log( mesg, Dragonfly.Spheres.HYDRO, visibility );
 };
 
-Dragonfly.prototype.Debug = function( mesg, visibility )
+Dragonfly.prototype.Error = function( mesg, visibility )
 {
 	this.Log( mesg, Dragonfly.Spheres.LITHO, visibility );
 };
