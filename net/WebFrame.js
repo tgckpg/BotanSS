@@ -101,7 +101,7 @@ Framework.prototype.plantResult = function()
 		{
 			if( !( this.result instanceof Buffer ) )
 			{
-				this.result = String( this.result );
+				this.result = new Buffer( this.result + "" );
 			}
 
 			this.HTTP.response.headers["Content-Length"] = this.result.length;
