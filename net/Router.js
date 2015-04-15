@@ -19,6 +19,7 @@ var RelayPoint = function( uri, internal )
 	);
 
 	this.value = internal ? uri : stripURI( uri );
+	this.params = Array.prototype.slice.call( arguments, 2 );
 };
 
 var Router = function( http )
@@ -63,6 +64,7 @@ Router.prototype.route = function()
 	var currentRoute = this.relaying.value;
 	var r;
 
+	// Direct means reroute using route key to match the route
 	if( this.relaying.direct )
 	{
 		if( r = this.routes[ this.relaying.value ] )
@@ -74,6 +76,7 @@ Router.prototype.route = function()
 	}
 	else
 	{
+		// Parse RegEx rules one by one
 		for( var i in this.routes )
 		{
 			r = this.routes[i];
@@ -99,11 +102,12 @@ Router.prototype.route = function()
 // Set Route
 Router.prototype.setRoute = function( _route, _match )
 {
+	var _self = this;
 	this.routeObj = {
 		route: _route
 		, match: _match
-		, router: this.router
-		, inputs: this.inputs
+		, router: _self.router
+		, inputs: _self.inputs
 
 		// Re-route function
 		, reRoute: function( target, direct )
@@ -112,11 +116,19 @@ Router.prototype.setRoute = function( _route, _match )
 				"Reroute: " + target
 				+ ( direct ? ", Direct" : "" )
 			);
-			this.relaying = new RelayPoint( target, direct );
-			this.routable = true;
-			this.reRoute = true;
-			this.emit( "Route" );
-		}.bind( this )
+			_self.relaying = new RelayPoint( target, direct );
+			_self.routable = true;
+			_self.reRoute = true;
+			_self.emit( "Route" );
+		}
+		, redirect: function( target )
+		{
+			Dragonfly.Debug( "Redirect: " + target );
+			_self.relaying = new RelayPoint( "302", true, target );
+			_self.routable = true;
+			_self.reRoute = true;
+			_self.emit( "Route" );
+		}
 	};
 };
 

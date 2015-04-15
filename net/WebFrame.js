@@ -3,6 +3,8 @@ var FatalError = require( '../errors/FatalError.js' );
 
 var Framework = function( garden )
 {
+	var _self = this;
+
 	this.HTTP = garden;
 	this.result = 0;
 	this.planted = false;
@@ -10,24 +12,38 @@ var Framework = function( garden )
 	this.requestObj = {};
 
 	var Router = require( "./Router" );
-	this.router = new Router( garden );
-	this.router.addRoute( "404", false, "404" );
-	this.router.addRoute( "500", false, "500" );
-	this.router.addListener( "Route", this.parseResult.bind( this ) );
+
+	var router = new Router( garden );
+	router.addRoute( "302", false, "302" );
+	router.addRoute( "404", false, "404" );
+	router.addRoute( "500", false, "500" );
+	router.addListener( "Route", this.parseResult.bind( this ) );
+
+	this.router = router;
+
+	var res = this.HTTP.response;
 
 	this.handlers = {
 		"404": function()
 		{
-			this.HTTP.response.statusCode = 404;
-			this.result = "404 Not Found";
-			this.plantResult();
-		}.bind( this )
+			res.statusCode = 404;
+			_self.result = "404 Not Found";
+			_self.plantResult();
+		}
+		, "302": function()
+		{
+			res.statusCode = 302;
+			res.headers[ "Location" ] = router.relaying.params[0];
+ 
+			_self.result = "";
+			_self.plantResult();
+		}
 		, "500": function()
 		{
-			this.HTTP.response.statusCode = 500;
-			this.result = "500 Internal Server Error";
-			this.plantResult();
-		}.bind( this )
+			res.statusCode = 500;
+			_self.result = "500 Internal Server Error";
+			_self.plantResult();
+		}
 	}
 };
 
@@ -46,7 +62,7 @@ Framework.prototype.run = function()
 		{
 			_self.parseResult();
 		});
-		
+
 		method = "POST";
 	}
 

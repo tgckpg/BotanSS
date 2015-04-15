@@ -1,10 +1,19 @@
 var encodeCookie = function( cookie )
 {
 	var cookieStr = "";
+	var p = "";
 	for( var i in cookie )
 	{
+		if( i.toLowerCase() == "path" )
+		{
+			p = cookie[i];
+			continue;
+		}
 		cookieStr += i + "=" + encodeURI( cookie[i] ) + ";";
 	}
+
+	// Path at tail
+	cookieStr += "path=" + p + ";";
 
 	return cookieStr; 
 };
