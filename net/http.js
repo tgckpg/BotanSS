@@ -1,4 +1,5 @@
 var Dragonfly = global.Dragonfly;
+var Cookie = require( "./Components/Cookie" );
 
 var HTTP = function( req, res )
 {
@@ -27,15 +28,18 @@ var HTTP = function( req, res )
 			}
 		}
 		, content: ''
+		, cookie: new Cookie( "", this )
 		, raw: res
 	};
 
 	this.request = {
 		uri: require('url').parse( req.url )
 		, isPost: ( req.method == 'POST' )
+		, cookie: new Cookie( req.headers.cookie, this )
 		, remoteAddr: req.connection.remoteAddress
 		, raw: req
 	};
+
 };
 
 
