@@ -1,9 +1,11 @@
+var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
 
-var util = require( "util" )
-	, events = require( "events" )
-	, FatalError = require( '../errors/FatalError.js' )
-;
+var util = require( "util" );
+var events = require( "events" );
+
+var FatalError = cl.load( "botanss.errors.FatalError" )
+
 
 var MaxRedirect = 10;
 

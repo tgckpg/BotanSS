@@ -1,5 +1,7 @@
+var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
-var Cookie = require( "./Components/Cookie" );
+
+var Cookie = cl.load( "botanss.net.components.Cookie" );
 
 var HTTP = function( req, res )
 {

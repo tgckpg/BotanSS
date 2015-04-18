@@ -1,7 +1,9 @@
+var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
 
 var domain = require('domain');
-var FatalError = require( '../errors/FatalError' );
+
+var FatalError = cl.load( "botanss.errors.FatalError" );
 
 // Message is hardcoded to prevent further exceptions occured
 // This function must be bug-free
@@ -52,7 +54,7 @@ function serverHandle( server, request, response, rHandle )
 // Construncor
 function AppDomain( handler, port, cluster )
 {
-	var http = require('http');
+	var http = require( "http" );
 	var server = http.createServer(
 		function(req, res) {
 			serverHandle( server, req, res, handler );

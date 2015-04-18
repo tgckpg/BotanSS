@@ -1,5 +1,7 @@
+var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
-var FatalError = require( '../errors/FatalError.js' );
+
+var FatalError = cl.load( "botanss.errors.FatalError" );
 
 var Framework = function( garden )
 {
@@ -11,7 +13,7 @@ var Framework = function( garden )
 	this.requestStr = "";
 	this.requestObj = {};
 
-	var Router = require( "./Router" );
+	var Router = cl.load( "botanss.net.Router" );
 
 	var router = new Router( garden );
 	router.addRoute( "302", false, "302" );
