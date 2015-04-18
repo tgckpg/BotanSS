@@ -2,18 +2,23 @@ var encodeCookie = function( cookie )
 {
 	var cookieStr = "";
 	var p = "";
+	var e = "";
 	for( var i in cookie )
 	{
-		if( i.toLowerCase() == "path" )
+		switch( i.toLowerCase() )
 		{
-			p = cookie[i];
-			continue;
+			case "path":
+				p = cookie[i];
+				continue;
+			case "expires":
+				e = cookie[i];
+				continue;
 		}
-		cookieStr += i + "=" + encodeURI( cookie[i] ) + ";";
+		cookieStr += i + "=" + cookie[i] + ";";
 	}
 
 	// Path at tail
-	cookieStr += "path=" + p + ";";
+	cookieStr += "Path=" + p + ";" + " Expires=" + e + ";";
 
 	return cookieStr; 
 };
