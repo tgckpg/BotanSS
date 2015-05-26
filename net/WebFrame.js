@@ -112,22 +112,48 @@ Framework.prototype.parseResult = function()
 
 Framework.prototype.plantResult = function()
 {
-	if( !this.planted )
-	{
-		this.planted = true;
-		if( this.HTTP )
-		{
-			if( !( this.result instanceof Buffer ) )
-			{
-				this.result = new Buffer( this.result + "" );
-			}
+	if( this.planted ) return;
 
-			this.HTTP.response.headers["Content-Length"] = this.result.length;
-			this.HTTP.response.write( this.result );
-			this.HTTP.response.end();
+	this.planted = true;
+	if( this.HTTP )
+	{
+		if( !( this.result instanceof Buffer ) )
+		{
+			this.result = new Buffer( this.result + "" );
 		}
 
+		this.HTTP.response.headers["Content-Length"] = this.result.length;
+		this.HTTP.response.write( this.result );
+		this.HTTP.response.end();
 	}
+};
+
+// This won't handle path exists
+// throwing an error is better than handling it
+// Need to handle it somewhere else
+Framework.prototype.plantFile = function( path, name )
+{
+	if( this.planted ) return;
+	var _self = this;
+	this.planted = true;
+
+	var resp = this.HTTP.response;
+
+	if( !name )
+	{
+		var p = require( "path" );
+		name = p.basename( path );
+	}
+
+	resp.headers[ "Content-Disposition" ] = "attachment; filename=\"" + name + "\"";
+
+	var fs = require( "fs" );
+
+	Dragonfly.Debug( "Stream out: " + path );
+
+	var rs = fs.createReadStream( path );
+	rs.addListener( "data", ( x ) => resp.write( x ) );
+	rs.addListener( "end", () => resp.end() );
 };
 
 module.exports = Framework;
