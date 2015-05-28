@@ -17,6 +17,7 @@ var Framework = function( garden )
 
 	var router = new Router( garden );
 	router.addRoute( "302", false, "302" );
+	router.addRoute( "403", false, "403" );
 	router.addRoute( "404", false, "404" );
 	router.addRoute( "500", false, "500" );
 	router.addListener( "Route", this.parseResult.bind( this ) );
@@ -26,7 +27,13 @@ var Framework = function( garden )
 	var res = this.HTTP.response;
 
 	this.handlers = {
-		"404": function()
+		"403": function()
+		{
+			res.statusCode = 403;
+			_self.result = "403 Forbidden";
+			_self.plantResult();
+		}
+		, "404": function()
 		{
 			res.statusCode = 404;
 			_self.result = "404 Not Found";
