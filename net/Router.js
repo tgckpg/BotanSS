@@ -38,7 +38,7 @@ var Router = function( http )
 	this.routeObj = {};
 	this.reRoute = false;
 
-	this.relaying = new RelayPoint( http.request.raw.url );
+	this.relaying = new RelayPoint( http.request.raw.url.split( "?" )[0] );
 };
 
 util.inherits( Router, events.EventEmitter );

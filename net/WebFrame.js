@@ -75,14 +75,19 @@ Framework.prototype.run = function()
 		method = "POST";
 	}
 
+	var url = this.HTTP.request.raw.url;
 	Dragonfly.Info(
 		( this.HTTP.request.raw.headers[ "x-forwarded-for" ] || this.HTTP.request.remoteAddr ) + " "
-		+ method + ": " + encodeURI( this.HTTP.request.raw.url )
+		+ method + ": " + encodeURI( url )
 		+ " - " + this.HTTP.request.raw.headers["user-agent"]
 		, Dragonfly.Visibility.VISIBLE
 	);
 
-	if( method == "GET" ) _self.parseResult();
+	if( method == "GET" )
+	{
+		_self.queryStr = url.split( "?" )[1];
+		_self.parseResult();
+	}
 };
 
 Framework.prototype.addHandler = function( name, method )
