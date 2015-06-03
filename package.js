@@ -13,7 +13,7 @@ Package.prototype.rootNS = function( name, path )
 	rootNS[ name ] = fs.realpathSync( path ) + "/";
 };
 
-Package.prototype.load = function( _class )
+Package.prototype.load = function( _class, deCache )
 {
 	var fSep = _class.indexOf( "." );
 	var nsdomain = _class.substr( 0, fSep );
@@ -24,6 +24,10 @@ Package.prototype.load = function( _class )
 	var lClass = require( file );
 	// TODO: Implements filewatcher
 
+	if( deCache )
+	{
+		delete require.cache[ require.resolve( file ) ];
+	}
 	return lClass;
 };
 
