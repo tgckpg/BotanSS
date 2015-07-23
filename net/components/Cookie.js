@@ -1,48 +1,16 @@
-var encodeCookie = function( cookie )
-{
-	var cookieStr = "";
-	var p = "";
-	var e = "";
-	for( var i in cookie )
-	{
-		switch( i.toLowerCase() )
-		{
-			case "path":
-				p = cookie[i];
-				continue;
-			case "expires":
-				e = cookie[i];
-				continue;
-		}
-		cookieStr += i + "=" + cookie[i] + ";";
-	}
+var cl = global.botanLoader;
 
-	// Path at tail
-	cookieStr += "Path=" + p + ";" + " Expires=" + e + ";";
+var util = require( "util" );
 
-	return cookieStr; 
-};
-
+var WebParam = cl.load( "botanss.utils.WebParam" );
 
 var Cookie = function( cookieStr, HTTP )
 {
-	var list = {};
-
-	cookieStr && cookieStr.split( ";" ).forEach( function( cookie )
-	{
-		var parts = cookie.split( "=" );
-		list[ parts.shift().trim() ] = decodeURI( parts.join( "=" ) );
-	} );
-
-	this.__cookie = list;
-
+	WebParam.call( this, cookieStr );
 	this.HTTP = HTTP;
 };
 
-Cookie.prototype.set = function( name, value )
-{
-	this.__cookie[ name ] = value;
-};
+util.inherits( Cookie, WebParam );
 
 Cookie.prototype.seth = function( name, value )
 {
@@ -50,15 +18,26 @@ Cookie.prototype.seth = function( name, value )
 	this.HTTP.response.headers[ "Set-Cookie" ] = this.toString();
 };
 
-Cookie.prototype.get = function( name )
-{
-	return this.__cookie[ name ];
-};
-
 Cookie.prototype.toString = function()
 {
-	return encodeCookie( this.__cookie );
+	var cookieStr = "";
+	var p = "";
+	var e = "";
+	for( var i in this.param )
+	{
+		switch( i.toLowerCase() )
+		{
+			case "path":
+				p = this.param[i];
+				continue;
+			case "expires":
+				e = this.param[i];
+				continue;
+		}
+		cookieStr += i + "=" + this.param[i] + ";";
+	}
+	cookieStr += "Path=" + p + ";" + " Expires=" + e + ";";
+	return cookieStr;
 };
-
 
 module.exports = Cookie;

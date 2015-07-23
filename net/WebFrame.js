@@ -1,5 +1,6 @@
 var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
+var CondStream = cl.load( "botanss.utils.CondStream" );
 
 var FatalError = cl.load( "botanss.errors.FatalError" );
 
@@ -63,14 +64,15 @@ Framework.prototype.run = function()
 	var method = "GET";
 	if( this.HTTP.request.isPost )
 	{
-		this.HTTP.request.raw.addListener( "data", function( data )
-		{
-			_self.requestStr += data.toString();
-		})
-		this.HTTP.request.raw.addListener( "end", function()
-		{
-			_self.parseResult();
-		});
+		_self.requestStr = new CondStream( "/tmp/", 2048 );
+
+		this.HTTP.request.raw.addListener(
+			"data" , ( x ) => _self.requestStr.write( x )
+		);
+
+		this.HTTP.request.raw.addListener(
+			"end", () => _self.requestStr.end( () => _self.parseResult() )
+		);
 
 		method = "POST";
 	}
