@@ -118,9 +118,10 @@ ConditionalStream.prototype.resultStream = function()
 	}
 
 	var st = new ReadStream();
+	st._read = function(){};
 
 	setTimeout( function() {
-		st.push( this.hexData, "hex" );
+		st.push( _self.hexData, "hex" );
 		st.push( null );
 	}, 0 );
 
