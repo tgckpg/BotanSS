@@ -140,6 +140,12 @@ Framework.prototype.plantResult = function()
 		this.HTTP.response.write( this.result );
 		this.HTTP.response.end();
 	}
+
+	// Release resources
+	if( this.requestStr )
+	{
+		this.requestStr.discard();
+	}
 };
 
 // This won't handle path exists

@@ -1,4 +1,6 @@
+var Dragonfly = global.Dragonfly;
 var fs = require( "fs" );
+var path = require( "path" );
 var crypto = require( "crypto" );
 var util = require( "util" );
 var ReadStream = require( "stream" ).Readable;
@@ -44,9 +46,9 @@ ConditionalStream.prototype.write = function( data )
 	// Trigger
 	if( this.limit < this.size )
 	{
-		this.file = this.tmpPath + "ss_" + crypto.randomBytes( 8 ).toString( "hex" );
+		this.file = path.join( this.tmpPath, "ss_" + crypto.randomBytes( 8 ).toString( "hex" ) );
  
-		this.stream = fs.createWriteStream( this.file );
+		this.stream = fs.createWriteStream( this.file, { mode: 0600 } );
 		this.stream.addListener( "finish", this.__end.bind( this ) );
 		this.stream.write( this.hexData, "hex" );
 	}
@@ -78,10 +80,11 @@ ConditionalStream.prototype.discard = function()
 	var _self = this;
 
 	this.__discard = true;
-	if( this.__finished )
+	if( this.__finished && this.file )
 	{
-		fs.unlink( this.file, function()
+		fs.unlink( this.file, function( e )
 		{
+			Dragonfly.Debug( "Client Data Closed: " + _self.file );
 			if( _self.__error ) throw new Error( _self.__error );
 		} );
 	}
