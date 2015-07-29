@@ -11,7 +11,7 @@ function server500( response, e )
 {
 	response.statusCode = 500;
 	response.setHeader( 'Content-Type', 'text/plain' );
-	response.end( e.message );
+	response.end( e.message || e );
 }
 
 function serverHandle( server, request, response, rHandle )
@@ -31,7 +31,7 @@ function serverHandle( server, request, response, rHandle )
 
 			server.close();
 
-			GLOBAL.X_SERVER_CLUSTER.worker.disconnect();
+			GLOBAL.X_SERVER_CLUSTER.worker.destroy();
 
 			server500( response, e );
 		}
