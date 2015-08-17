@@ -36,7 +36,7 @@ Cookie.prototype.toString = function()
 		}
 		cookieStr += i + "=" + this.param[i] + ";";
 	}
-	cookieStr += "Path=" + p + ";" + " Expires=" + e + ";";
+	cookieStr += "Path=" + p + ";" + ( e ? ( " Expires=" + e + ";" ) : "" );
 	return cookieStr;
 };
 
