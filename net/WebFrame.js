@@ -139,6 +139,7 @@ Framework.prototype.plantResult = function()
 		this.HTTP.response.headers["Content-Length"] = this.result.length;
 		this.HTTP.response.write( this.result );
 		this.HTTP.response.end();
+		Dragonfly.Debug( "Result Planted" );
 	}
 
 	// Release resources
