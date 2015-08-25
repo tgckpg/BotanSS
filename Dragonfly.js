@@ -52,7 +52,8 @@ function Dragonfly( logHandler )
 	}
 
 	var cluster = require("cluster");
-	this.ptag = "[ " + ( cluster.isMaster ? "M" : "S" ) + ":" + process.pid + " ] ";
+	var tag = cluster.isMaster ? "M" : "S";
+	this.ptag = "[ " + tag + ":" + process.pid + " ] ";
 
 	this.Info( "Dragonfly ready.", Dragonfly.Visibility.VISIBLE );
 }
