@@ -1,48 +1,68 @@
+"use strict";
+
 var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
 
 var Cookie = cl.load( "botanss.net.components.Cookie" );
 
-var HTTP = function( req, res )
+class CResponse
 {
-	var _self = this;
-	var canExit = true;
+	constructor( res )
+	{
+		this.raw = res;
+		this.canExit = true;
 
-	// Simple HTTP Model
-	this.response = {
-		statusCode: 200
-		, headers: {
+		this.statusCode = 200;
+		this.headers = {
 			"Content-Type": "text/html; charset=utf-8"
 			, "Powered-By": "Botanical Framework (Node.js)"
-		}
-		, write: function( str ) { _self.response.content = str }
-		, writeLine: function( str ) { _self.response.content += str + "\n"; }
-		, end: function()
+		};
+
+		this.content = "";
+		this.cookie = new Cookie( "", this );
+	}
+
+
+	end()
+	{
+		if( this.canExit )
 		{
-			if( canExit )
-			{
-				canExit = false;
+			this.canExit = false;
 
-				var rc = _self.response;
-
-				res.writeHead( rc.statusCode, rc.headers );
-				res.end( rc.content );
-			}
+			console.log( this.content );
+			this.raw.writeHead( this.statusCode, this.headers );
+			this.raw.end( this.content );
 		}
-		, content: ''
-		, cookie: new Cookie( "", this )
-		, raw: res
-	};
+	}
 
-	this.request = {
-		uri: require('url').parse( req.url )
-		, isPost: ( req.method == 'POST' )
-		, cookie: new Cookie( req.headers.cookie, this )
-		, remoteAddr: req.connection.remoteAddress
-		, raw: req
-	};
+	write( str ) { this.content = str }
+	writeLine( str ) { this.content += str + "\n"; }
 
-};
+}
 
+class CRequest
+{
+	get isPost() { return this.raw.method == 'POST'; }
+	get remoteAddr() { return this.raw.connection.remoteAddress; }
 
-module.exports = HTTP;
+	constructor( req )
+	{
+		this.raw = req;
+		this.uri = require('url').parse( req.url );
+		this.cookie = new Cookie( req.headers.cookie, this )
+	}
+}
+
+class Http
+{
+	constructor( req, res )
+	{
+		var _self = this;
+
+		// Simple Http Model
+		this.response = new CResponse( res );
+		this.request = new CRequest( req );
+	}
+}
+
+module.exports = Http;
