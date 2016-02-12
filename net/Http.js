@@ -7,7 +7,7 @@ var Cookie = cl.load( "botanss.net.components.Cookie" );
 
 class CResponse
 {
-	constructor( res )
+	constructor( res, Http )
 	{
 		this.raw = res;
 		this.canExit = true;
@@ -19,7 +19,7 @@ class CResponse
 		};
 
 		this.content = "";
-		this.cookie = new Cookie( "", this );
+		this.cookie = new Cookie( "", Http );
 	}
 
 
@@ -45,11 +45,11 @@ class CRequest
 	get isPost() { return this.raw.method == 'POST'; }
 	get remoteAddr() { return this.raw.connection.remoteAddress; }
 
-	constructor( req )
+	constructor( req, Http )
 	{
 		this.raw = req;
 		this.uri = require('url').parse( req.url );
-		this.cookie = new Cookie( req.headers.cookie, this )
+		this.cookie = new Cookie( req.headers.cookie, Http )
 	}
 }
 
@@ -60,8 +60,8 @@ class Http
 		var _self = this;
 
 		// Simple Http Model
-		this.response = new CResponse( res );
-		this.request = new CRequest( req );
+		this.response = new CResponse( res, this );
+		this.request = new CRequest( req, this );
 	}
 }
 

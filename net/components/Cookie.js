@@ -1,43 +1,43 @@
+"use strict";
+
 var cl = global.botanLoader;
-
-var util = require( "util" );
-
 var WebParam = cl.load( "botanss.utils.WebParam" );
 
-var Cookie = function( cookieStr, HTTP )
+class Cookie extends WebParam
 {
-	WebParam.call( this, cookieStr );
-	this.HTTP = HTTP;
-};
-
-util.inherits( Cookie, WebParam );
-
-Cookie.prototype.seth = function( name, value )
-{
-	this.set( name, value );
-	this.HTTP.response.headers[ "Set-Cookie" ] = this.toString();
-};
-
-Cookie.prototype.toString = function()
-{
-	var cookieStr = "";
-	var p = "";
-	var e = "";
-	for( var i in this.param )
+	constructor( cookieStr, HTTP )
 	{
-		switch( i.toLowerCase() )
-		{
-			case "path":
-				p = this.param[i];
-				continue;
-			case "expires":
-				e = this.param[i];
-				continue;
-		}
-		cookieStr += i + "=" + this.param[i] + ";";
+		super( cookieStr );
+		this.HTTP = HTTP;
 	}
-	cookieStr += "Path=" + p + ";" + ( e ? ( " Expires=" + e + ";" ) : "" );
-	return cookieStr;
-};
+
+	seth( name, value )
+	{
+		this.set( name, value );
+		this.HTTP.response.headers[ "Set-Cookie" ] = this.toString();
+	}
+
+	toString()
+	{
+		var cookieStr = "";
+		var p = "";
+		var e = "";
+		for( var i in this.param )
+		{
+			switch( i.toLowerCase() )
+			{
+				case "path":
+					p = this.param[i];
+					continue;
+				case "expires":
+					e = this.param[i];
+					continue;
+			}
+			cookieStr += i + "=" + this.param[i] + ";";
+		}
+		cookieStr += "Path=" + p + ";" + ( e ? ( " Expires=" + e + ";" ) : "" );
+		return cookieStr;
+	}
+}
 
 module.exports = Cookie;

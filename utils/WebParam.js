@@ -1,35 +1,41 @@
-var WebParam = function( paramStr )
-{
-	var list = {};
+"use strict";
 
-	paramStr && paramStr.split( ";" ).forEach( function( param )
+class WebParam
+{
+	constructor( paramStr )
 	{
-		var parts = param.split( "=" );
-		list[ parts.shift().trim() ] = decodeURI( parts.join( "=" ) );
-	} );
+		var list = {};
 
-	this.param = list;
-};
+		paramStr && paramStr.split( ";" ).forEach( function( param )
+		{
+			var parts = param.split( "=" );
+			list[ parts.shift().trim() ] = decodeURI( parts.join( "=" ) );
+		} );
 
-WebParam.prototype.set = function( name, value )
-{
-	this.param[ name ] = value;
-};
-
-WebParam.prototype.get = function( name )
-{
-	return this.param[ name ];
-};
-
-WebParam.prototype.toString = function()
-{
-	var paramStr = "";
-	for( var i in param )
-	{
-		paramStr += i + "=" + param[i] + ";";
+		this.param = list;
 	}
-	return paramStr;
-};
+
+	set( name, value )
+	{
+		this.param[ name ] = value;
+	}
+
+	get( name )
+	{
+		return this.param[ name ];
+	}
+
+	toString()
+	{
+		var paramStr = "";
+		for( var i in param )
+		{
+			paramStr += i + "=" + param[i] + ";";
+		}
+		return paramStr;
+	}
+
+}
 
 WebParam.ExtractHeader = function( hstr )
 {

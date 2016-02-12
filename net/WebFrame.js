@@ -1,180 +1,184 @@
+"use strict";
+
 var cl = global.botanLoader;
 var Dragonfly = global.Dragonfly;
 var CondStream = cl.load( "botanss.utils.CondStream" );
 
 var FatalError = cl.load( "botanss.errors.FatalError" );
 
-var Framework = function( garden )
+class WebFrame
 {
-	var _self = this;
-
-	this.HTTP = garden;
-	this.result = 0;
-	this.planted = false;
-	this.requestStr = "";
-	this.requestObj = {};
-
-	var Router = cl.load( "botanss.net.Router" );
-
-	var router = new Router( garden );
-	router.addRoute( "302", false, "302" );
-	router.addRoute( "403", false, "403" );
-	router.addRoute( "404", false, "404" );
-	router.addRoute( "500", false, "500" );
-	router.addListener( "Route", this.parseResult.bind( this ) );
-
-	this.router = router;
-
-	var res = this.HTTP.response;
-
-	this.handlers = {
-		"403": function()
-		{
-			res.statusCode = 403;
-			_self.result = "403 Forbidden";
-			_self.plantResult();
-		}
-		, "404": function()
-		{
-			res.statusCode = 404;
-			_self.result = "404 Not Found";
-			_self.plantResult();
-		}
-		, "302": function()
-		{
-			res.statusCode = 302;
-			res.headers[ "Location" ] = router.relaying.params[0];
- 
-			_self.result = "";
-			_self.plantResult();
-		}
-		, "500": function()
-		{
-			res.statusCode = 500;
-			_self.result = "500 Internal Server Error";
-			_self.plantResult();
-		}
-	}
-};
-
-Framework.prototype.run = function()
-{
-	var _self = this;
-
-	var method = "GET";
-	if( this.HTTP.request.isPost )
+	constructor( Http )
 	{
-		_self.requestStr = new CondStream( "/tmp/", 2048 );
+		var _self = this;
 
-		this.HTTP.request.raw.addListener(
-			"data" , ( x ) => _self.requestStr.write( x )
-		);
+		this.HTTP = Http;
+		this.result = 0;
+		this.planted = false;
+		this.requestStr = "";
+		this.requestObj = {};
 
-		this.HTTP.request.raw.addListener(
-			"end", () => _self.requestStr.end( () => _self.parseResult() )
-		);
+		var Router = cl.load( "botanss.net.Router" );
 
-		method = "POST";
-	}
+		var router = new Router( Http );
+		router.addRoute( "302", false, "302" );
+		router.addRoute( "403", false, "403" );
+		router.addRoute( "404", false, "404" );
+		router.addRoute( "500", false, "500" );
+		router.addListener( "Route", this.__parse.bind( this ) );
 
-	var url = this.HTTP.request.raw.url;
-	Dragonfly.Info(
-		( this.HTTP.request.raw.headers[ "x-forwarded-for" ] || this.HTTP.request.remoteAddr ) + " "
-		+ method + ": " + encodeURI( url )
-		+ " - " + this.HTTP.request.raw.headers["user-agent"]
-		, Dragonfly.Visibility.VISIBLE
-	);
+		this.router = router;
 
-	if( method == "GET" )
-	{
-		_self.queryStr = url.split( "?" )[1];
-		_self.parseResult();
-	}
-};
+		var res = this.HTTP.response;
 
-Framework.prototype.addHandler = function( name, method )
-{
-	this.handlers[ name ] = method.bind( this );
-};
-
-Framework.prototype.parseResult = function()
-{
-	if( this.router.routable )
-	{
-		var method = this.router.route();
-		if( method )
-		{
-			Dragonfly.Debug( "Call " + method, Dragonfly.Spheres.THERMO );
-
-			if( this.handlers[ method ] )
+		this.handlers = {
+			"403": function()
 			{
-				this.handlers[ method ]( this.router.routeObj );
-				return;
+				res.statusCode = 403;
+				_self.result = "403 Forbidden";
+				_self.plantResult();
+			}
+			, "404": function()
+			{
+				res.statusCode = 404;
+				_self.result = "404 Not Found";
+				_self.plantResult();
+			}
+			, "302": function()
+			{
+				res.statusCode = 302;
+				res.headers[ "Location" ] = router.relaying.params[0];
+	 
+				_self.result = "";
+				_self.plantResult();
+			}
+			, "500": function()
+			{
+				res.statusCode = 500;
+				_self.result = "500 Internal Server Error";
+				_self.plantResult();
 			}
 		}
-		else if( method === false )
+	}
+
+	run()
+	{
+		var _self = this;
+
+		var method = "GET";
+		if( this.HTTP.request.isPost )
 		{
-			Dragonfly.Debug( "No route is defined to handle this URI", Dragonfly.Spheres.THERMO );
-			this.router.routeObj.reRoute( "404", true );
-			return;
+			this.requestStr = new CondStream( "/tmp/", 2048 );
+
+			this.HTTP.request.raw.addListener(
+				"data" , ( x ) => _self.requestStr.write( x )
+			);
+
+			this.HTTP.request.raw.addListener(
+				"end", () => _self.requestStr.end( () => _self.__parse() )
+			);
+
+			method = "POST";
 		}
 
-		throw new FatalError( "Relay handler \"" + method + "\" is not defined" );
+		var url = this.HTTP.request.raw.url;
+		Dragonfly.Info(
+			( this.HTTP.request.raw.headers[ "x-forwarded-for" ] || this.HTTP.request.remoteAddr ) + " "
+			+ method + ": " + encodeURI( url )
+			+ " - " + this.HTTP.request.raw.headers["user-agent"]
+			, Dragonfly.Visibility.VISIBLE
+		);
+
+		if( method == "GET" )
+		{
+			this.queryStr = url.split( "?" )[1];
+			this.__parse();
+		}
 	}
 
-};
-
-Framework.prototype.plantResult = function()
-{
-	if( this.planted ) return;
-
-	this.planted = true;
-	if( this.HTTP )
+	addHandler( name, method )
 	{
-		if( !( this.result instanceof Buffer ) )
+		this.handlers[ name ] = method.bind( this );
+	}
+
+	plantResult()
+	{
+		if( this.planted ) return;
+
+		this.planted = true;
+		if( this.HTTP )
 		{
-			this.result = new Buffer( this.result + "" );
+			if( !( this.result instanceof Buffer ) )
+			{
+				this.result = new Buffer( this.result + "" );
+			}
+
+			this.HTTP.response.headers["Content-Length"] = this.result.length;
+			this.HTTP.response.write( this.result );
+			this.HTTP.response.end();
+			Dragonfly.Debug( "Result Planted" );
 		}
 
-		this.HTTP.response.headers["Content-Length"] = this.result.length;
-		this.HTTP.response.write( this.result );
-		this.HTTP.response.end();
-		Dragonfly.Debug( "Result Planted" );
+		// Release resources
+		if( this.requestStr )
+		{
+			this.requestStr.discard();
+		}
 	}
 
-	// Release resources
-	if( this.requestStr )
+	// This won't handle path exists
+	// throwing an error is better than handling it
+	// Need to handle it somewhere else
+	plantFile( path, name )
 	{
-		this.requestStr.discard();
+		if( this.planted ) return;
+		var _self = this;
+		this.planted = true;
+
+		var resp = this.HTTP.response;
+
+		if( !name )
+		{
+			var p = require( "path" );
+			name = p.basename( path );
+		}
+
+		resp.headers[ "Content-Disposition" ] = "attachment; filename=\"" + name + "\"";
+
+		var fs = require( "fs" );
+
+		Dragonfly.Debug( "Stream out: " + path );
+
+		var rs = fs.createReadStream( path );
+		rs.addListener( "data", ( x ) => resp.write( x ) );
+		rs.addListener( "end", () => resp.end() );
 	}
-};
 
-// This won't handle path exists
-// throwing an error is better than handling it
-// Need to handle it somewhere else
-Framework.prototype.plantFile = function( path, name )
-{
-	if( this.planted ) return;
-	var _self = this;
-	this.planted = true;
-
-	var resp = this.HTTP.response;
-
-	if( !name )
+	__parse()
 	{
-		var p = require( "path" );
-		name = p.basename( path );
+		if( this.router.routable )
+		{
+			var method = this.router.route();
+			if( method )
+			{
+				Dragonfly.Debug( "Call " + method, Dragonfly.Spheres.THERMO );
+
+				if( this.handlers[ method ] )
+				{
+					this.handlers[ method ]( this.router.routeObj );
+					return;
+				}
+			}
+			else if( method === false )
+			{
+				Dragonfly.Debug( "No route is defined to handle this URI", Dragonfly.Spheres.THERMO );
+				this.router.routeObj.reRoute( "404", true );
+				return;
+			}
+
+			throw new FatalError( "Relay handler \"" + method + "\" is not defined" );
+		}
 	}
+}
 
-	resp.headers[ "Content-Disposition" ] = "attachment; filename=\"" + name + "\"";
-
-	var fs = require( "fs" );
-
-	Dragonfly.Debug( "Stream out: " + path );
-
-	var rs = fs.createReadStream( path );
-	rs.addListener( "data", ( x ) => resp.write( x ) );
-	rs.addListener( "end", () => resp.end() );
-};
-
-module.exports = Framework;
+module.exports = WebFrame;
