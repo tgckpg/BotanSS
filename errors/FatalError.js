@@ -1,19 +1,12 @@
-function error( msg )
+"use strict";
+
+class FatalError extends Error
 {
-	this.name = "Fatal Error";
-	this.message = msg;
-
-	var e = new Error();
-	e = e.stack.split( "\n" );
-	e[0] = this.name;
-	e[1] = msg;
-
-	this.stack = e.join( "\n" );
+	constructor( msg )
+	{
+		super( msg );
+		this.name = "FatalError";
+	}
 }
 
-error.prototype.toString = function()
-{
-	return this.name + " " + this.message;
-}
-
-module.exports = error;
+module.exports = FatalError;
