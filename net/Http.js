@@ -29,7 +29,6 @@ class CResponse
 		{
 			this.canExit = false;
 
-			console.log( this.content );
 			this.raw.writeHead( this.statusCode, this.headers );
 			this.raw.end( this.content );
 		}
