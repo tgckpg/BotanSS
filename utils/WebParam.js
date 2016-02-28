@@ -28,9 +28,9 @@ class WebParam
 	toString()
 	{
 		var paramStr = "";
-		for( var i in param )
+		for( var i in this.param )
 		{
-			paramStr += i + "=" + param[i] + ";";
+			paramStr += i + "=" + this.param[i] + ";";
 		}
 		return paramStr;
 	}

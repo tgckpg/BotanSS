@@ -7,10 +7,16 @@ var https = require( "https" );
 
 class HttpRequestCompleteEventArgs
 {
-	constructor( statusCode, ResponseData )
+	constructor( Response, ResponseData )
 	{
-		this.statusCode = statusCode;
+		this.statusCode = Response.statusCode;
 		this.Data = ResponseData;
+		this.Response = Response;
+	}
+
+	get Headers()
+	{
+		return this.Response.headers;
 	}
 
 	get ResponseString()
@@ -101,7 +107,7 @@ class HttpRequest extends EventEmitter
 
 		Response.addListener( "end", () => {
 			_self.emit( "RequestComplete"
-				, this, new HttpRequestCompleteEventArgs( Response.statusCode, ResponseData )
+				, this, new HttpRequestCompleteEventArgs( Response, ResponseData )
 			);
 		} );
 	}
