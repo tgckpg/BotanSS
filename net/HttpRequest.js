@@ -37,6 +37,8 @@ class HttpRequest extends EventEmitter
 		this.Headers = Headers || {
 			"User-Agent": "BotanSS HttpRequest"
 		};
+
+		this.Secured = false;
 	}
 
 	SetUrl( Url )
@@ -52,6 +54,7 @@ class HttpRequest extends EventEmitter
 		case "https://":
 			Url = Url.substr( 8 );
 			this.Port = 443;
+			this.Secured = true;
 			break;
 		}
 
@@ -80,7 +83,7 @@ class HttpRequest extends EventEmitter
 	{
 		if( !this.Hostname ) throw new Error( "Url not set" );
 
-		var req = ( this.Port == 80 ? http : https )
+		var req = ( this.Secured ? https : http )
 			.request( this.Options, this.OnResponseReceived.bind( this ) );
 		req.end( this.RawPostData );
 	}
