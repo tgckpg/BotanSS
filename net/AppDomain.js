@@ -31,7 +31,7 @@ function serverHandle( server, request, response, rHandle )
 
 			server.close();
 
-			GLOBAL.X_SERVER_CLUSTER.worker.destroy();
+			global.X_SERVER_CLUSTER.worker.destroy();
 
 			server500( response, e );
 		}
