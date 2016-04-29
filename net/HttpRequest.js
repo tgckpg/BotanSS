@@ -31,14 +31,14 @@ class HttpRequest extends EventEmitter
 	{
 		super();
 
+		this.Secured = false;
+
 		this.SetUrl( Url );
 
 		this.Method = "GET";
 		this.Headers = Headers || {
 			"User-Agent": "BotanSS HttpRequest"
 		};
-
-		this.Secured = false;
 	}
 
 	SetUrl( Url )
