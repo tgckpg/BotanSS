@@ -9,8 +9,17 @@ class HttpRequestCompleteEventArgs
 {
 	constructor( Response, ResponseData )
 	{
-		this.statusCode = Response.statusCode;
-		this.Data = ResponseData;
+		if( ResponseData === undefined )
+		{
+			this.statusCode = -1;
+			this.Data = new Buffer( 0 );
+		}
+		else
+		{
+			this.statusCode = Response.statusCode;
+			this.Data = ResponseData;
+		}
+
 		this.Response = Response;
 	}
 
@@ -85,6 +94,11 @@ class HttpRequest extends EventEmitter
 
 		var req = ( this.Secured ? https : http )
 			.request( this.Options, this.OnResponseReceived.bind( this ) );
+
+		req.addListener( "error", ( err ) => {
+			this.emit( "RequestComplete", this, new HttpRequestCompleteEventArgs( err ) )
+		} );
+
 		req.end( this.RawPostData );
 	}
 
@@ -101,7 +115,6 @@ class HttpRequest extends EventEmitter
 
 	OnResponseReceived( Response )
 	{
-		var _self = this;
 		var ResponseData = new Buffer( 0 );
 
 		Response.addListener( "data", 
@@ -109,7 +122,7 @@ class HttpRequest extends EventEmitter
 		);
 
 		Response.addListener( "end", () => {
-			_self.emit( "RequestComplete"
+			this.emit( "RequestComplete"
 				, this, new HttpRequestCompleteEventArgs( Response, ResponseData )
 			);
 		} );
