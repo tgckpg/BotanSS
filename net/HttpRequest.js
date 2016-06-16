@@ -5,34 +5,7 @@ var EventEmitter = require( "events" ).EventEmitter;
 var http = require( "http" );
 var https = require( "https" );
 
-class HttpRequestCompleteEventArgs
-{
-	constructor( Response, ResponseData )
-	{
-		if( ResponseData === undefined )
-		{
-			this.statusCode = -1;
-			this.Data = new Buffer( 0 );
-		}
-		else
-		{
-			this.statusCode = Response.statusCode;
-			this.Data = ResponseData;
-		}
-
-		this.Response = Response;
-	}
-
-	get Headers()
-	{
-		return this.Response.headers;
-	}
-
-	get ResponseString()
-	{
-		return this.Data.toString( "utf-8" );
-	}
-}
+var CompleteEventArgs = require( "./events/HttpRequestComplete" );
 
 class HttpRequest extends EventEmitter
 {
@@ -96,7 +69,7 @@ class HttpRequest extends EventEmitter
 			.request( this.Options, this.OnResponseReceived.bind( this ) );
 
 		req.addListener( "error", ( err ) => {
-			this.emit( "RequestComplete", this, new HttpRequestCompleteEventArgs( err ) )
+			this.emit( "RequestComplete", this, new CompleteEventArgs( err ) )
 		} );
 
 		req.end( this.RawPostData );
@@ -123,12 +96,12 @@ class HttpRequest extends EventEmitter
 
 		Response.addListener( "end", () => {
 			this.emit( "RequestComplete"
-				, this, new HttpRequestCompleteEventArgs( Response, ResponseData )
+				, this, new CompleteEventArgs( Response, ResponseData )
 			);
 		} );
 	}
 }
 
-HttpRequest.HttpRequestCompleteEventArgs = HttpRequestCompleteEventArgs;
+HttpRequest.HttpRequestCompleteEventArgs = CompleteEventArgs;
 
 module.exports = HttpRequest;
