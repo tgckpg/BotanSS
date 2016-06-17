@@ -48,7 +48,7 @@ class CRequest
 	{
 		this.raw = req;
 		this.uri = require('url').parse( req.url );
-		this.cookie = new Cookie( req.headers.cookie, Http )
+		this.cookie = new Cookie( req.headers.cookie, Http );
 	}
 }
 
@@ -56,8 +56,6 @@ class Http
 {
 	constructor( req, res )
 	{
-		var _self = this;
-
 		// Simple Http Model
 		this.response = new CResponse( res, this );
 		this.request = new CRequest( req, this );
