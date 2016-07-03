@@ -75,10 +75,9 @@ class PostFrame extends EventEmitter
 			{
 				if( !( this.result instanceof Buffer ) )
 				{
-					this.result = String( this.result );
+					this.result = new Buffer( this.result + "" );
 				}
 
-				this.HTTP.response.headers["Content-Type"] = "text/plain";
 				this.HTTP.response.headers["Content-Length"] = this.result.length;
 				this.HTTP.response.write( this.result );
 				this.HTTP.response.end();
