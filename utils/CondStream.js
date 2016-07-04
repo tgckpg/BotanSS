@@ -1,19 +1,18 @@
 "use strict";
-var Dragonfly = global.Dragonfly;
 
-var fs = require( "fs" );
-var path = require( "path" );
-var crypto = require( "crypto" );
+const Dragonfly = global.Dragonfly;
 
-var ReadStream = require( "stream" ).Readable;
+const fs = require( "fs" );
+const path = require( "path" );
+const crypto = require( "crypto" );
+
+const ReadStream = require( "stream" ).Readable;
 
 class ConditionalStream extends String
 {
 	constructor( tmpPath, triggerLimit )
 	{
 		super();
-		// XXX: Dirty fix for incompat on node js v5
-		Object.setPrototypeOf( this, new.target.prototype );
 
 		if( !tmpPath )
 		{
@@ -36,7 +35,6 @@ class ConditionalStream extends String
 
 	write( data )
 	{
-		var _self = this;
 		this.size += data.length;
 
 		if( this.stream )
@@ -61,36 +59,32 @@ class ConditionalStream extends String
 
 	end( handler )
 	{
-		var _self = this;
 		if( this.stream )
 		{
-			this.stream.addListener( "close", function() {
-				_self.__finished = true;
-				handler( _self );
+			this.stream.addListener( "close", () => {
+				this.__finished = true;
+				handler( this );
 			} );
 			this.stream.end();
 		}
 		else
 		{
-			setTimeout( function()
-			{
-				_self.__finished = true;
-				handler( _self )
+			setTimeout( () => {
+				this.__finished = true;
+				handler( this );
 			} , 0 );
 		}
 	}
 
 	discard()
 	{
-		var _self = this;
-
 		this.__discard = true;
 		if( this.__finished && this.file )
 		{
-			fs.unlink( this.file, function( e )
+			fs.unlink( this.file, ( e ) =>
 			{
-				Dragonfly.Debug( "Client Data Closed: " + _self.file );
-				if( _self.__error ) throw new Error( _self.__error );
+				Dragonfly.Debug( "Client Data Closed: " + this.file );
+				if( this.__error ) throw new Error( this.__error );
 			} );
 		}
 	}
@@ -108,22 +102,21 @@ class ConditionalStream extends String
 
 	resultStream()
 	{
-		var _self = this;
 		if( !this.__finished ) throw new Error( "Data is not finished yet" );
 		if( this.__discard ) throw new Error( "Data is discarded" );
 
 		if( this.stream )
 		{
 			var rt = fs.createReadStream( this.file );
-			rt.addListener( "close", () => _self.discard() );
+			rt.addListener( "close", () => this.discard() );
 			return rt;
 		}
 
 		var st = new ReadStream();
 		st._read = function(){};
 
-		setTimeout( function() {
-			st.push( _self.hexData, "hex" );
+		setTimeout( () => {
+			st.push( this.hexData, "hex" );
 			st.push( null );
 		}, 0 );
 
