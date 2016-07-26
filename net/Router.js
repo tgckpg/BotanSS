@@ -104,7 +104,6 @@ class Router extends EventEmitter
 		return false;
 	}
 
-
 	// Set Route
 	setRoute( _route, _match )
 	{
@@ -127,18 +126,16 @@ class Router extends EventEmitter
 				_self.reRoute = true;
 				_self.emit( "Route" );
 			}
-			, redirect: function( target )
+			, redirect: function( target, perm )
 			{
 				Dragonfly.Debug( "Redirect: " + target );
-				_self.relaying = new RelayPoint( "302", true, target );
+				_self.relaying = new RelayPoint( perm ? "301" : "302", true, target );
 				_self.routable = true;
 				_self.reRoute = true;
 				_self.emit( "Route" );
 			}
 		};
 	}
-
 }
-
 
 module.exports = Router;

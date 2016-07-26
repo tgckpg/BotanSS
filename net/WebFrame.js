@@ -21,6 +21,7 @@ class WebFrame
 		var Router = cl.load( "botanss.net.Router" );
 
 		var router = new Router( Http );
+		router.addRoute( "301", false, "301" );
 		router.addRoute( "302", false, "302" );
 		router.addRoute( "403", false, "403" );
 		router.addRoute( "404", false, "404" );
@@ -44,11 +45,17 @@ class WebFrame
 				_self.result = "404 Not Found";
 				_self.plantResult();
 			}
+			, "301": function()
+			{
+				res.statusCode = 301;
+				res.headers[ "Location" ] = router.relaying.params[0];
+				_self.result = "";
+				_self.plantResult();
+			}
 			, "302": function()
 			{
 				res.statusCode = 302;
 				res.headers[ "Location" ] = router.relaying.params[0];
-	 
 				_self.result = "";
 				_self.plantResult();
 			}
