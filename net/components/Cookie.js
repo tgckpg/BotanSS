@@ -35,7 +35,7 @@ class Cookie extends WebParam
 			}
 			cookieStr += i + "=" + this.param[i] + ";";
 		}
-		cookieStr += "Path=" + p + ";" + ( e ? ( " Expires=" + e + ";" ) : "" );
+		cookieStr += "Path=" + p + ( e ? ( "; Expires=" + e + ";" ) : "" );
 		return cookieStr;
 	}
 }
