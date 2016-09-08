@@ -57,7 +57,7 @@ class HttpRequest extends EventEmitter
 	{
 		this.Method = "POST";
 		this.Headers[ "Content-Type" ] = "application/x-www-form-urlencoded";
-		this.RawPostData = new Buffer( Data );
+		this.RawPostData = Data == undefined ? new Buffer([]) : new Buffer( Data );
 		this.Headers[ "Content-Length" ] = this.RawPostData.length;
 	}
 
