@@ -1,10 +1,11 @@
 "use strict";
 
-var cl = global.botanLoader;
-var Dragonfly = global.Dragonfly;
-var CondStream = cl.load( "botanss.utils.CondStream" );
+const cl = global.botanLoader;
+const Dragonfly = global.Dragonfly;
+const PageCache = global.botanPageCache;
 
-var FatalError = cl.load( "botanss.errors.FatalError" );
+const CondStream = cl.load( "botanss.utils.CondStream" );
+const FatalError = cl.load( "botanss.errors.FatalError" );
 
 class WebFrame
 {
@@ -108,7 +109,7 @@ class WebFrame
 		this.handlers[ name ] = method.bind( this );
 	}
 
-	plantResult()
+	plantResult( cache, ttl )
 	{
 		if( this.planted ) return;
 
@@ -124,12 +125,28 @@ class WebFrame
 			this.HTTP.response.write( this.result );
 			this.HTTP.response.end();
 			Dragonfly.Debug( "Result Planted" );
+
+			this.__storeCache( cache, ttl );
 		}
 
 		// Release resources
 		if( this.requestStr )
 		{
 			this.requestStr.discard();
+		}
+	}
+
+	__storeCache( cache, ttl )
+	{
+		if( cache && PageCache )
+		{
+			if( ttl == undefined ) ttl = 30;
+			PageCache.store(
+				this.HTTP.request.raw
+				, this.HTTP.response
+				, this.result
+				, ttl
+			);
 		}
 	}
 
