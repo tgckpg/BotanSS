@@ -16,6 +16,7 @@ class WebFrame
 		this.HTTP = Http;
 		this.result = 0;
 		this.planted = false;
+		this.allowCache = true;
 		this.requestStr = "";
 		this.requestObj = {};
 
@@ -138,7 +139,7 @@ class WebFrame
 
 	__storeCache( cache, ttl )
 	{
-		if( cache && PageCache )
+		if( this.allowCache && cache && PageCache )
 		{
 			if( ttl == undefined ) ttl = 30;
 			PageCache.store(

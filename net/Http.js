@@ -1,9 +1,9 @@
 "use strict";
 
-var cl = global.botanLoader;
-var Dragonfly = global.Dragonfly;
+const cl = global.botanLoader;
+const Dragonfly = global.Dragonfly;
 
-var Cookie = cl.load( "botanss.net.components.Cookie" );
+const Cookie = cl.load( "botanss.net.components.Cookie" );
 
 class CResponse
 {
@@ -21,7 +21,6 @@ class CResponse
 		this.content = "";
 		this.cookie = new Cookie( "", Http );
 	}
-
 
 	end()
 	{

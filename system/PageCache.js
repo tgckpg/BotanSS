@@ -3,17 +3,27 @@
 const Dragonfly = global.Dragonfly;
 const cl = global.botanLoader;
 
+const Cookie = cl.load( "botanss.net.components.Cookie" );
+
 class PageCache
 {
 	constructor()
 	{
-		this.cache = { };
+		this.cache = {};
+		this.excepts = {};
+
 		setInterval( () => {
 			var d = new Date().getTime();
 			for( var i in this.cache )
 			{
 				var c = this.cache[ i ];
 				if( c.ttl < d ) delete this.cache[ i ];
+			}
+
+			for( var i in this.excepts )
+			{
+				var c = this.excepts[ i ];
+				if( c.ttl < d ) delete this.excepts[ i ];
 			}
 		}, 30000 );
 	}
@@ -38,8 +48,22 @@ class PageCache
 		Dragonfly.Debug( "StoreCache: \"" + key + "\", expire " + new Date( expires ) );
 	}
 
+	except( sid, ttl )
+	{
+		if( !global.pagecache ) return;
+
+		var expires = new Date().getTime() + 1000 * ttl;
+
+		this.excepts[ sid ] = { ttl: expires };
+
+		Dragonfly.Debug( "CacheExcept: \"" + sid.substr( 0, 8 ) + "\", expire " + new Date( expires ) );
+	}
+
 	process( req, res )
 	{
+		var cookie = new Cookie( req.headers.cookie );
+		if( cookie.get( "sid" ) in this.excepts ) return false;
+
 		var url = req.url;
 		if( url in this.cache )
 		{
