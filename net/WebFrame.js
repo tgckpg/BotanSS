@@ -25,6 +25,7 @@ class WebFrame
 		var router = new Router( Http );
 		router.addRoute( "301", false, "301" );
 		router.addRoute( "302", false, "302" );
+		router.addRoute( "400", false, "400" );
 		router.addRoute( "403", false, "403" );
 		router.addRoute( "404", false, "404" );
 		router.addRoute( "500", false, "500" );
@@ -39,6 +40,12 @@ class WebFrame
 			{
 				res.statusCode = 403;
 				_self.result = "403 Forbidden";
+				_self.plantResult();
+			}
+			, "400": function()
+			{
+				res.statusCode = 404;
+				_self.result = "400 Bad Request";
 				_self.plantResult();
 			}
 			, "404": function()
