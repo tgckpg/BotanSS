@@ -35,16 +35,21 @@ class PageCache
 
 		var expires = new Date().getTime() + 1000 * ttl;
 
-		this.cache[ key ] = {
+		var c = {
 			data: data
 			, headers: {
 				"Content-Length": res.headers[ "Content-Length" ]
 				, "Content-Type": res.headers[ "Content-Type" ]
 				, "X-Cache-Expires": new Date( expires )
 			}
+			, statusCode: res.statusCode
 			, ttl: expires
 		};
 
+		if( res.headers[ "Location" ] )
+			c.headers[ "Location" ] = res.headers[ "Location" ];
+
+		this.cache[ key ] = c;
 		Dragonfly.Debug( "StoreCache: \"" + key + "\", expire " + new Date( expires ) );
 	}
 
@@ -76,9 +81,9 @@ class PageCache
 			);
 
 			var c = this.cache[ url ];
-			res.headers = c.headers;
-			res.write( c.data );
-			res.end();
+			res.writeHead( c.statusCode, c.headers );
+			res.end( c.data );
+
 			return true;
 		}
 

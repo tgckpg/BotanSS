@@ -59,7 +59,7 @@ class WebFrame
 				res.statusCode = 301;
 				res.headers[ "Location" ] = router.relaying.params[0];
 				_self.result = "";
-				_self.plantResult();
+				_self.plantResult( true );
 			}
 			, "302": function()
 			{
